@@ -4,11 +4,10 @@ import 'package:flutter/material.dart';
 
 import './form.dart';
 import '../main.dart';
-import './login_screen.dart';
 import './archive_screen.dart';
 
 class DrawerWidget extends StatelessWidget {
-  Widget MenulistTile(
+  Widget menulistTile(
       context, String title, Widget iconvalue, String reference, bool type) {
     return Container(
       padding: const EdgeInsets.all(10),
@@ -18,9 +17,13 @@ class DrawerWidget extends StatelessWidget {
         splashColor: Theme.of(context).primaryColor,
         child: ListTile(
           onTap: () {
-            type
-                ? Navigator.of(context).pushNamed(reference)
-                : Navigator.of(context).pushReplacementNamed(reference);
+            if (reference == '') {
+              Navigator.of(context).pop();
+            } else {
+              type
+                  ? Navigator.of(context).pushNamed(reference)
+                  : Navigator.of(context).pushReplacementNamed(reference);
+            }
           },
           leading: iconvalue,
           title: Text(
@@ -54,38 +57,31 @@ class DrawerWidget extends StatelessWidget {
               ),
             ),
           ),
-          MenulistTile(
+          menulistTile(
             context,
             'Home',
             const Icon(Icons.home),
             RegistrationPage.routename,
             false,
           ),
-          MenulistTile(
+          menulistTile(
               context,
               'Register',
               const Icon(Icons.app_registration_outlined),
               FormCard.routename,
               true),
-          MenulistTile(
+          menulistTile(
             context,
             'Archive',
             const Icon(Icons.archive_rounded),
             ArchiveScreen.routename,
             true,
           ),
-          MenulistTile(
-            context,
-            'Login',
-            const Icon(Icons.login),
-            LoginScreen.routename,
-            true,
-          ),
-          MenulistTile(
+          menulistTile(
             context,
             'Exit',
             const Icon(Icons.logout),
-            FormCard.routename,
+            '',
             true,
           ),
         ],

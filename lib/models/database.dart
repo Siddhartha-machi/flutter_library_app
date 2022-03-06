@@ -1,6 +1,31 @@
 import 'package:flutter/cupertino.dart';
 
 import '../models/element_datails.dart';
+import '../models/student_form.dart';
+
+class StudentAuthenticationData with ChangeNotifier {
+  List<StudentFormInput> _detailsArchive = [];
+  void addtolist(Map<String, Object> studentDetails) {
+    _detailsArchive.add(
+      StudentFormInput(
+          department: studentDetails['Department'].toString(),
+          dob: studentDetails['DOB'].toString(),
+          email: studentDetails['Email'].toString(),
+          id: studentDetails['ID'].toString(),
+          mobile: studentDetails['Mobile'].toString(),
+          name: studentDetails['Name'].toString(),
+          year: studentDetails['Year'] as int),
+    );
+  }
+
+  void get printdetails {
+    StudentFormInput.printstudentdata(_detailsArchive[0]);
+  }
+
+  List<StudentFormInput> get getdetails {
+    return [..._detailsArchive];
+  }
+}
 
 class Data with ChangeNotifier {
   final List<ElementDetails> _archive = [

@@ -1,5 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:libraryapp/models/database.dart';
+
 import 'package:provider/provider.dart';
 
 import './screens/form.dart';
@@ -7,14 +9,14 @@ import './screens/drawer.dart';
 import './screens/login_screen.dart';
 import './screens/archive_screen.dart';
 import './screens/archive_item_screen.dart';
+import './screens/conformation_screen.dart';
+import 'package:libraryapp/models/database.dart';
 
 void main() {
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(
-        create: (_) => Data(),
-      ),
       ChangeNotifierProvider.value(value: Data()),
+      ChangeNotifierProvider.value(value: StudentAuthenticationData()),
     ],
     child: MaterialApp(
       initialRoute: RegistrationPage.routename,
@@ -24,6 +26,7 @@ void main() {
         LoginScreen.routename: (context) => LoginScreen(),
         ArchiveScreen.routename: (context) => ArchiveScreen(),
         ArchiveItemScreen.routename: (context) => ArchiveItemScreen(),
+        ConformationPageScreen.routename: (context) => ConformationPageScreen()
       },
       theme: ThemeData(
         primaryColor: Colors.cyan.shade300,
@@ -36,15 +39,27 @@ void main() {
 
 class RegistrationPage extends StatelessWidget {
   static const routename = '/';
+
   @override
   Widget build(BuildContext context) {
     Widget BuildButton(String title, String screensrc) {
+      // final handler = Provider.of<StudentAuthenticationData>(context);
+      // final datahandler = Provider.of<Data>(context);
+      // handler.printdetails;
+      // print(datahandler.viewlist);
       return Container(
+        padding: const EdgeInsets.all(10),
         width: double.infinity,
         child: ElevatedButton(
-          child: Text(title),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           onPressed: () {
-            Navigator.pushNamed(context, screensrc);
+            Navigator.of(context).pushNamed(screensrc);
           },
         ),
       );
@@ -55,11 +70,10 @@ class RegistrationPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Library Online'),
       ),
-      body: SingleChildScrollView(
+      body: Center(
         child: Container(
-          decoration: const BoxDecoration(
-            color: Color.fromRGBO(255, 153, 255, 0.3),
-          ),
+          height: 500,
+          width: 500,
           child: Column(
             children: [
               BuildButton('Register', FormCard.routename),

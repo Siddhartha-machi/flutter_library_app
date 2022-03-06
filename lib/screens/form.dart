@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:libraryapp/models/database.dart';
+import 'package:provider/provider.dart';
 
-import '../models/student_form.dart';
+import '../screens/conformation_screen.dart';
 
 class FormCard extends StatefulWidget {
   static const routename = '/form';
-  var _response;
 
   @override
   State<FormCard> createState() => _FormCardState();
@@ -12,7 +13,7 @@ class FormCard extends StatefulWidget {
 
 class _FormCardState extends State<FormCard> {
   final _formKey = GlobalKey<FormState>();
-  Map<String, dynamic> inputresponses = {};
+  Map<String, Object> inputresponses = {};
 
   Widget buildformwidget(
       ctx, String title, keyboardtypevalue, Function validityhandler,
@@ -29,7 +30,7 @@ class _FormCardState extends State<FormCard> {
       margin: const EdgeInsets.symmetric(vertical: 10),
       child: TextFormField(
         validator: (value) {
-          return value == null ? 'Provide some input!' : validityhandler(value);
+          return value == '' ? 'Provide some input!' : validityhandler(value);
           // if (value == null) {
           //   return 'Provide some input!';
           // }
@@ -44,7 +45,7 @@ class _FormCardState extends State<FormCard> {
         decoration: InputDecoration(
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 5),
-          labelText: isrequired ? '$title * $htext' : '$title $htext',
+          labelText: isrequired ? '$title $htext * ' : '$title $htext',
           fillColor: Theme.of(ctx).primaryColor,
         ),
       ),
@@ -72,6 +73,8 @@ class _FormCardState extends State<FormCard> {
 
   @override
   Widget build(BuildContext context) {
+    final studentdatahandler =
+        Provider.of<StudentAuthenticationData>(context).addtolist;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Registration Portal'),
@@ -106,6 +109,7 @@ class _FormCardState extends State<FormCard> {
                   if (inputvalue.length <= 6) {
                     return 'Name should be atleast 6 characters long!';
                   }
+                  inputresponses.addAll({'Name': inputvalue});
                   return null;
                 },
               ),
@@ -114,16 +118,16 @@ class _FormCardState extends State<FormCard> {
                 'ID Number',
                 TextInputType.number,
                 (String inputvalue) {
-                  var number;
+                  var year;
                   try {
-                    number = int.parse(inputvalue).toString();
+                    year = int.parse(inputvalue).toString();
                   } catch (error) {
                     return 'Not a valid value';
                   }
-                  if (number.length > 10) {
-                    return 'ID number should have a length 10';
+                  if (year.length != 10) {
+                    return 'ID year should have a length 10';
                   }
-
+                  inputresponses.addAll({'ID': inputvalue});
                   return null;
                 },
               ),
@@ -133,16 +137,16 @@ class _FormCardState extends State<FormCard> {
                 TextInputType.number,
                 (String inputvalue) {
                   // print(inputvalue);
-                  var number;
+                  var year;
                   try {
-                    number = int.parse(inputvalue);
+                    year = int.parse(inputvalue);
                   } catch (error) {
                     return 'Not a valid value';
                   }
-                  if (number > 4 || number <= 0) {
-                    return '$number year doesn\'t exist!';
+                  if (year > 4 || year <= 0) {
+                    return ' Year $year doesn\'t exist!';
                   }
-
+                  inputresponses.addAll({'Year': year});
                   return null;
                 },
               ),
@@ -151,11 +155,25 @@ class _FormCardState extends State<FormCard> {
                 'Department',
                 TextInputType.text,
                 (String inputvalue) {
+                  final val1;
+                  final val2;
                   // print(inputvalue);
-
+                  try {
+                    if (inputvalue.toLowerCase() == inputvalue) {
+                      return 'Invalid department';
+                    }
+                    val1 = int.tryParse(inputvalue);
+                    val2 = double.tryParse(inputvalue);
+                  } catch (error) {
+                    return 'Invalid department';
+                  }
+                  if (val1 != null || val2 != null) {
+                    return 'Invalid department';
+                  }
                   if (inputvalue.length != 3) {
                     return 'Department name should be 3 characters long only!';
                   }
+                  inputresponses.addAll({'Department': inputvalue});
                   return null;
                 },
                 'Eg : CSE',
@@ -165,10 +183,12 @@ class _FormCardState extends State<FormCard> {
                 'Email Address',
                 TextInputType.emailAddress,
                 (String inputvalue) {
-                  if (inputvalue.length <= 5 ||
-                      inputvalue.contains('@gmail.com')) {
+                  if (!RegExp(
+                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                      .hasMatch(inputvalue)) {
                     return 'Gmail Format or Domain is wrong!';
                   }
+                  inputresponses.addAll({'Email': inputvalue});
                   return null;
                 },
               ),
@@ -177,17 +197,17 @@ class _FormCardState extends State<FormCard> {
                 'Mobile Number',
                 TextInputType.phone,
                 (String inputvalue) {
-                  print(inputvalue);
-                  var number;
+                  // print(inputvalue);
+                  var year;
                   try {
-                    number = int.parse(inputvalue);
+                    year = int.parse(inputvalue);
                   } catch (error) {
-                    return '$number Not a valid value';
+                    return '\'$inputvalue\' Not a valid value';
                   }
-                  if (number > 10 || number <= 0) {
+                  if (year.toString().length > 10 || year.toString().isEmpty) {
                     return 'Number should be 10 digits long!';
                   }
-
+                  inputresponses.addAll({'Mobile': inputvalue});
                   return null;
                 },
                 '',
@@ -198,9 +218,11 @@ class _FormCardState extends State<FormCard> {
                 'Date of Birth',
                 TextInputType.datetime,
                 (String inputvalue) {
-                  print(inputvalue);
-
-                  return null;
+                  if (inputvalue.length == 8 || inputvalue.length == 10) {
+                    inputresponses.addAll({'DOB': inputvalue});
+                    return null;
+                  }
+                  return 'Not a valid format';
                 },
               ),
               Row(
@@ -208,13 +230,18 @@ class _FormCardState extends State<FormCard> {
                   Expanded(
                     flex: 2,
                     child: buildbutton('Reset', () {
-                      print('Reset button is clicked!');
+                      _formKey.currentState!.reset();
                     }, Colors.blue),
                   ),
                   Expanded(
                     flex: 2,
                     child: buildbutton('Register', () {
-                      _formKey.currentState!.validate();
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+                        studentdatahandler(inputresponses);
+                        Navigator.of(context).pushReplacementNamed(
+                            ConformationPageScreen.routename);
+                      }
                     }, Colors.green),
                   ),
                 ],
